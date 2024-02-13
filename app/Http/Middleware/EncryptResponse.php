@@ -9,6 +9,7 @@ class EncryptResponse
 {
     public function handle($request, Closure $next)
     {
+        // Obtener la respuesta del siguiente middleware
         $response = $next($request);
 
         // Obtener el contenido de la respuesta
@@ -17,9 +18,12 @@ class EncryptResponse
         // Cifrar el contenido usando Crypt
         $encryptedContent = Crypt::encryptString($content);
 
-        // Establecer el contenido cifrado en la respuesta
-        $response->setContent($encryptedContent);
+        // Crear un arreglo con la data cifrada
+        $responseData = [
+            'data' => $encryptedContent
+        ];
 
-        return $response;
+        // Retornar un JSON con la data cifrada
+        return response()->json($responseData);
     }
 }
