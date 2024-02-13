@@ -16,7 +16,7 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-    $router->group(['middleware' => 'cors'], function () use ($router) {
+$router->group(['middleware' => 'cors'], function () use ($router) {
     $router->get("releases", 'Controller@releases');
     $router->get("anime/list", 'Controller@animes');
     $router->get("anime/simulcast", 'Controller@simulcast');

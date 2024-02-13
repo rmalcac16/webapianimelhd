@@ -1,40 +1,35 @@
 <?php
 
-/**
- * Location: /app/Http/Middleware
- */
 namespace App\Http\Middleware;
 
 use Closure;
 
 class CorsMiddleware
 {
-	/**
-	 * Handle an incoming request.
-	 *
-	 * @param  \Illuminate\Http\Request  $request
-	 * @param  \Closure  $next
-	 * @return mixed
-	 */
-	public function handle($request, Closure $next)
-	{
-		$headers = [
-			'Access-Control-Allow-Origin' => '*',
-			'Access-Control-Allow-Methods' => 'POST,GET,PATCH,PUT,DELETE,OPTIONS',
-			'Access-Control-Max-Age' => '86400',
-                        'Access-Control-Allow-Headers' => 'Content-Type,API-KEY'
-                ];
+    public function handle($request, Closure $next)
+    {
+        // Establece los encabezados CORS
+        $headers = [
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, POST, PUT, DELETE, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization',
+            'Access-Control-Allow-Credentials' => 'true',
+        ];
 
-		if ($request->isMethod('GET')) {
-			return response()->json('', 200, $headers);
-		}
+        // Verifica si la solicitud es una solicitud de pre-vuelo (OPTIONS)
+        if ($request->isMethod('OPTIONS')) {
+            // Responde con los encabezados CORS para las solicitudes de pre-vuelo
+            return response()->json('OK', 200, $headers);
+        }
 
-		$response = $next($request);
+        // Continúa con la solicitud HTTP normal
+        $response = $next($request);
 
-		foreach ($headers as $key => $value) {
-			$response->header($key, $value);
-		}
+        // Agrega los encabezados CORS a la respuesta
+        foreach ($headers as $key => $value) {
+            $response->header($key, $value);
+        }
 
-		return $response;
-	}
+        return $response;
+    }
 }
