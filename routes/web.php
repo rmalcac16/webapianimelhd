@@ -16,14 +16,13 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
-$router->group(['middleware' => 'cors'], function () use ($router) {
-    $router->get("releases", 'Controller@releases');
-    $router->get("anime/list", 'Controller@animes');
-    $router->get("anime/simulcast", 'Controller@simulcast');
-    $router->get("anime/search", 'Controller@search');
-    $router->get("anime/latino", 'Controller@latino');
-    $router->get("anime/trending", 'Controller@trending');
-    $router->get("anime/more-view", 'Controller@moreview');
-    $router->get("anime/{slug}", 'Controller@anime');
-    $router->get("anime/{slug}/episodes/{number}", 'Controller@episode');
-});
+
+$router->get("releases", 'Controller@releases');
+$router->get("anime/list", 'Controller@animes');
+$router->get("anime/simulcast", 'Controller@simulcast');
+$router->get("anime/search", 'Controller@search');
+$router->get("anime/latino", 'Controller@latino');
+$router->get("anime/trending", 'Controller@trending');
+$router->get("anime/more-view", 'Controller@moreview');
+$router->get("anime/{slug}", 'Controller@anime');
+$router->get("anime/{slug}/episodes/{number}", 'Controller@episode');

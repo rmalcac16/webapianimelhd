@@ -73,6 +73,7 @@ $app->configure('app');
 */
 
 $app->middleware([
+    Fruitcake\Cors\HandleCors::class,
     App\Http\Middleware\EncryptResponse::class
 ]);
 
@@ -99,7 +100,11 @@ $app->routeMiddleware([
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
-$app->register(App\Providers\CatchAllOptionsRequestsProvider::class);
+$app->register(Fruitcake\Cors\CorsServiceProvider::class);
+$app->configure('cors');
+$app->middleware([
+    Fruitcake\Cors\HandleCors::class
+]);
 
 /*
 |--------------------------------------------------------------------------
