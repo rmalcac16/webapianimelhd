@@ -48,21 +48,22 @@ class Episode extends Model
             $data->anterior = $this->previous($anime, $request->number);
             $data->siguiente = $this->next($anime, $request->number);
             $data->players = $this->players($data->id);
-            $data->token = $this->createToken($data->id);
+            $data->token = $this->createToken($request, $data->id);
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
         }
     }
 
-    public function createToken($episode_id)
+    public function createToken($request, $episode_id)
     {
         try {
             $token = md5(uniqid(rand(), true));
             DB::table('tokens')->insert([
                 'episode_id' => $episode_id,
                 'token' => $token,
-                'created_at' => date('Y-m-d H:i:s')
+                'created_at' => date('Y-m-d H:i:s'),
+                'referrer' => $request->ip()
             ]);
             return $token;
         } catch (Exception $e) {
