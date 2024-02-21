@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('encrypted')->group(function () {
+// Route::middleware('encrypted')->group(function () {
     Route::get("releases",[Controller::class, 'releases']);
     Route::get("anime/list", [Controller::class, 'animes']);
     Route::get("anime/simulcast", [Controller::class, 'simulcast']);
@@ -29,4 +29,4 @@ Route::middleware('encrypted')->group(function () {
     Route::get("anime/more-view", [Controller::class, 'moreview']);
     Route::get("anime/{slug}", [Controller::class, 'anime']);
     Route::get("anime/{slug}/episodes/{number}", [Controller::class, 'episode']);
-});
+// });

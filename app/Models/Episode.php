@@ -22,7 +22,6 @@ class Episode extends Model
             $data = $this->select('animes.name', 'animes.slug','animes.banner', 'animes.poster', 'players.created_at', 'episodes.number', 'players.languaje')
             ->leftJoin('players','players.episode_id','episodes.id')
             ->leftJoin('animes', 'animes.id', 'episodes.anime_id')
-            ->where('episodes.id', '<=', 32239)
             ->where('animes.status', 1)
             ->groupBy('players.languaje', 'episodes.id')
 		    ->orderBy('players.id', 'desc')
