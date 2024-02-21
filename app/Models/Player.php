@@ -20,5 +20,13 @@ class Player extends Model
         return $this->belongsTo(Episode::class);
     }
 
+    public function getPlayerById($id){
+        return $this->select('players.id','code','embed','title','languaje','server_id')
+            ->join('servers','servers.id','=','players.server_id')
+            ->where('players.id',$id)
+            ->orderBy('players.server_id','asc')
+            ->first();
+    }
+
     
 }

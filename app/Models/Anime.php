@@ -69,7 +69,7 @@ class Anime extends Model
 			->orwhere('genres','LIKE',"%{$request->search}%")
 			->orwhere('aired','LIKE',"%{$request->search}%")
 	        ->orderBy('aired','desc')
-	        ->limit(20)
+	        ->limit(10)
 			->get();
             return response()->json($data, 200);
         } catch (Exception $e) {
@@ -113,31 +113,6 @@ class Anime extends Model
             return response()->json(['message' => $e->getMessage()], 401);
         }
     }
-
-
-    public function recommendations($anime)
-    {
-        $first_name = explode(' ', trim($anime->name));
-        $first_name = $first_name[0];
-        $genres = explode(',', trim($anime->genres));
-        $first_genre = '';
-        $second_genre = '';
-        if (count($genres) >= 2) {
-            $randoms = array_rand($genres, 2);
-            $first_genre = $genres[$randoms[0]];
-            $second_genre = $genres[$randoms[1]];
-        }
-        return app('db')
-            ->table('animes')
-            ->select('id', 'name', 'banner')
-            ->where('genres', 'LIKE', "%{$first_genre}%")
-            ->where('genres', 'LIKE', "%{$second_genre}%")
-            ->where('slug', '!=', $anime->slug)
-            ->limit(10)
-            ->inRandomOrder()
-            ->get();
-    }
-    
 
 	public function animes($request)
     {

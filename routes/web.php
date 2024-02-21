@@ -1,28 +1,22 @@
 <?php
 
-/** @var \Laravel\Lumen\Routing\Router $router */
+use Illuminate\Support\Facades\Route;
+
+use App\Http\Controllers\Controller;
 
 /*
 |--------------------------------------------------------------------------
-| Application Routes
+| Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register all of the routes for an application.
-| It is a breeze. Simply tell Lumen the URIs it should respond to
-| and give it the Closure to call when that URI is requested.
+| Here is where you can register web routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
 |
 */
 
-$router->get('/', function () use ($router) {
-    return $router->app->version();
+Route::get('/', function () {
+    return view('welcome');
 });
 
-$router->get("releases", 'Controller@releases');
-$router->get("anime/list", 'Controller@animes');
-$router->get("anime/simulcast", 'Controller@simulcast');
-$router->get("anime/search", 'Controller@search');
-$router->get("anime/latino", 'Controller@latino');
-$router->get("anime/trending", 'Controller@trending');
-$router->get("anime/more-view", 'Controller@moreview');
-$router->get("anime/{slug}", 'Controller@anime');
-$router->get("anime/{slug}/episodes/{number}", 'Controller@episode');
+Route::get('/video/{id}', [Controller::class, 'video']);
