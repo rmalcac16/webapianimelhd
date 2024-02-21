@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Routing\Controller as BaseController;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 
 use App\Models\Anime;
@@ -66,16 +66,18 @@ class Controller extends BaseController
 
     public function video(Request $request)
     {
-        $referer = $_SERVER['HTTP_REFERER'] ?? null;
-        $parse = parse_url($referer);
-        if($parse['host'] != 'www.animelatinohd.com')
-            return abort(403, 'Sin acceso');
-        $id = Crypt::decryptString($request->id);
-        $player = $this->player->getPlayerById($id);
-        if(!$player)
-            return abort(404, 'No encontrado');            
-        $link = $this->getFullUrl($player);
-        return redirect($link);   
+        $token = $request->_token;
+        if(DB::table('tokens')->where('token', $token)->exists()){
+            DB::table('tokens')->where('token', $token)->delete();
+            $id = Crypt::decryptString($request->id);
+            $player = $this->player->getPlayerById($id);
+            if(!$player)
+                return abort(404, 'No encontrado');            
+            $link = $this->getFullUrl($player);
+            return redirect($link);   
+        }else{
+            return abort(401, 'No autorizado');
+        }
     }
 
     public function getFullUrl($player){

@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Session;
 
+use Illuminate\Support\Facades\DB;
+
 class Episode extends Model
 {
     use HasFactory;
@@ -38,17 +40,33 @@ class Episode extends Model
         try {
             $anime = Anime::select('id','name','slug','banner','poster')->where('slug', $request->slug)->first();
             $data = $this
-            ->select('id','number','views')
-		    ->where('anime_id',$anime->id)
-			->where('number',$request->number)
-			->first();
+                ->select('id','number','views')
+                ->where('anime_id',$anime->id)
+                ->where('number',$request->number)
+                ->first();
             $data->anime = $anime;
             $data->anterior = $this->previous($anime, $request->number);
             $data->siguiente = $this->next($anime, $request->number);
             $data->players = $this->players($data->id);
+            $data->token = $this->createToken($data->id);
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
+        }
+    }
+
+    public function createToken($episode_id)
+    {
+        try {
+            $token = md5(uniqid(rand(), true));
+            DB::table('tokens')->insert([
+                'episode_id' => $episode_id,
+                'token' => $token,
+                'created_at' => date('Y-m-d H:i:s')
+            ]);
+            return $token;
+        } catch (Exception $e) {
+            return "Token no creado";
         }
     }
 
