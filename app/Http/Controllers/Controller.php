@@ -64,12 +64,27 @@ class Controller extends BaseController
     }
 
 
+    public function token(Request $request){
+        try {
+            $token = md5(uniqid(rand(), true));
+            DB::table('tokens')->insert([
+                'player_id' => Crypt::decryptString($request->episode_id),
+                'token' => $token,
+                'created_at' => date('Y-m-d H:i:s'),
+                'referrer' => $request->ip()
+            ]);
+            return response()->json(['token' => $token], 200);
+        } catch (Exception $e) {
+            return response()->json(['message' => $e->getMessage()], 401);
+        }
+    }
+
     public function video(Request $request)
     {
-        $token = $request->_token;
-        if(DB::table('tokens')->where('token', $token)->exists()){
+        $token = Crypt::decryptString($request->token);
+        $id = Crypt::decryptString($request->id);
+        if(DB::table('tokens')->where('token', $token)->where('player_id',$id)->exists()){
             DB::table('tokens')->where('token', $token)->delete();
-            $id = Crypt::decryptString($request->id);
             $player = $this->player->getPlayerById($id);
             if(!$player)
                 return abort(404, 'No encontrado');            

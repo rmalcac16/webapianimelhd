@@ -47,33 +47,16 @@ class Episode extends Model
             $data->anime = $anime;
             $data->anterior = $this->previous($anime, $request->number);
             $data->siguiente = $this->next($anime, $request->number);
-            $data->players = $this->players($data->id);
-            $data->token = $this->createToken($request, $data->id);
+            $data->players = $this->players($data->id, $request);
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
         }
     }
 
-    public function createToken($request, $episode_id)
+    public function players($id, $request)
     {
-        try {
-            $token = md5(uniqid(rand(), true));
-            DB::table('tokens')->insert([
-                'episode_id' => $episode_id,
-                'token' => $token,
-                'created_at' => date('Y-m-d H:i:s'),
-                'referrer' => $request->ip()
-            ]);
-            return $token;
-        } catch (Exception $e) {
-            return "Token no creado";
-        }
-    }
-
-    public function players($id)
-    {
-        return Player::select('players.id','languaje','server_id')
+        $players = Player::select('players.id','languaje','server_id')
             ->leftJoin('servers','servers.id','=','players.server_id')
             ->where('episode_id',$id)
             ->where(function ($query) {
@@ -81,8 +64,8 @@ class Episode extends Model
                     ->orWhere('status', 2);
             })
             ->with(['server'])
-            ->get()
-            ->groupby('languaje');
+            ->get();
+        return $players->groupBy('languaje');
     }
 	
 	

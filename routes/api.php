@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -30,3 +31,6 @@ Route::middleware('encrypted')->group(function () {
     Route::get("anime/{slug}", [Controller::class, 'anime']);
     Route::get("anime/{slug}/episodes/{number}", [Controller::class, 'episode']);
 });
+
+Route::post('/login', [AuthController::class, 'login']);
+Route::get('/token/{episode_id}', [Controller::class, 'token']);
