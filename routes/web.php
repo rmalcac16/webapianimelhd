@@ -19,4 +19,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/video/{id}/{token}', [Controller::class, 'video']);
+Route::get('/video/{id}', [Controller::class, 'video']);

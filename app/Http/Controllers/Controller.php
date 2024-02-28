@@ -81,18 +81,14 @@ class Controller extends BaseController
 
     public function video(Request $request)
     {
-        $token = Crypt::decryptString($request->token);
         $id = Crypt::decryptString($request->id);
-        if(DB::table('tokens')->where('token', $token)->where('player_id',$id)->exists()){
-            DB::table('tokens')->where('token', $token)->delete();
-            $player = $this->player->getPlayerById($id);
-            if(!$player)
-                return abort(404, 'No encontrado');            
-            $link = $this->getFullUrl($player);
-            return redirect($link);   
-        }else{
-            return abort(401, 'No autorizado');
-        }
+        if(!$id)
+            return abort(404, 'ID no definido');
+        $player = $this->player->getPlayerById($id);
+        if(!$player)
+            return abort(404, 'No encontrado');
+        $link = $this->getFullUrl($player);
+        return redirect($link);
     }
 
     public function getFullUrl($player){
