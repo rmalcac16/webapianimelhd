@@ -39,11 +39,13 @@ class Episode extends Model
     {
         try {
             $anime = Anime::select('id','name','slug','banner','poster')->where('slug', $request->slug)->first();
+            if(!$anime) return response()->json(['message' => 'Anime not found'], 404);
             $data = $this
                 ->select('id','number','views')
                 ->where('anime_id',$anime->id)
                 ->where('number',$request->number)
                 ->first();
+            if(!$data) return response()->json(['message' => 'Episode not found'], 404);
             $data->anime = $anime;
             $data->anterior = $this->previous($anime, $request->number);
             $data->siguiente = $this->next($anime, $request->number);
@@ -56,17 +58,20 @@ class Episode extends Model
 
     public function players($id, $request)
     {
-        $players = Player::select('players.id','languaje','server_id')
-            ->leftJoin('servers','servers.id','=','players.server_id')
-            ->where('episode_id',$id)
+        $players = Player::select('players.id', 'languaje', 'server_id')
+            ->leftJoin('servers', 'servers.id', '=', 'players.server_id')
+            ->where('episode_id', $id)
             ->where(function ($query) {
                 $query->where('status', 1)
                     ->orWhere('status', 2);
             })
             ->with(['server'])
+            ->orderBy('servers.position')
             ->get();
+            
         return $players->groupBy('languaje');
     }
+
 	
 	
 	public function previous($anime, $number)

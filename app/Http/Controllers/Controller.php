@@ -8,6 +8,9 @@ use Illuminate\Routing\Controller as BaseController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Crypt;
 
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+
 use App\Models\Anime;
 use App\Models\Episode;
 use App\Models\Player;
@@ -81,14 +84,35 @@ class Controller extends BaseController
 
     public function video(Request $request)
     {
+        $link = route('videoLink', ['id' => $request->id]);
+        return view('iframe', ['link' => $link]);
+    }
+
+    public function videoLink(Request $request)
+    {
+        // if(!$request->headers->has('Referer')) {
+        //     return abort(403, 'Acceso denegado');
+        // }
+        // if($request->headers->has('X-Frame-Options')) {
+        //     $xFrameOptions = $request->headers->get('X-Frame-Options');
+        //     if(!in_array($xFrameOptions, ['DENY', 'SAMEORIGIN'])) {
+        //         return abort(403, 'Acceso denegado');
+        //     }
+        // }
+        // $referer = $request->headers->get('Referer');
+        // if(strpos($referer, 'www.animelatinohd.com') === false) {
+        //     return abort(403, 'Acceso denegado');
+        // }
         $id = Crypt::decryptString($request->id);
-        if(!$id)
+        if(!$id) {
             return abort(404, 'ID no definido');
+        }
         $player = $this->player->getPlayerById($id);
-        if(!$player)
+        if(!$player) {
             return abort(404, 'No encontrado');
+        }
         $link = $this->getFullUrl($player);
-        return redirect($link);
+        return redirect()->away($link);
     }
 
     public function getFullUrl($player){

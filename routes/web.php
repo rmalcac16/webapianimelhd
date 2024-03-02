@@ -20,3 +20,4 @@ Route::get('/', function () {
 });
 
 Route::get('/video/{id}', [Controller::class, 'video']);
+Route::get('/videoLink/{id}', [Controller::class, 'videoLink'])->name('videoLink');
