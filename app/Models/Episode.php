@@ -27,7 +27,7 @@ class Episode extends Model
             ->where('animes.status', 1)
             ->groupBy('players.languaje', 'episodes.id')
 		    ->orderBy('players.id', 'desc')
-            ->limit(30)
+            ->limit(42)
 			->get();
             return response()->json($data, 200);
         } catch (Exception $e) {

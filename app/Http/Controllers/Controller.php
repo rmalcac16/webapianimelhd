@@ -90,19 +90,19 @@ class Controller extends BaseController
 
     public function videoLink(Request $request)
     {
-        // if(!$request->headers->has('Referer')) {
-        //     return abort(403, 'Acceso denegado');
-        // }
-        // if($request->headers->has('X-Frame-Options')) {
-        //     $xFrameOptions = $request->headers->get('X-Frame-Options');
-        //     if(!in_array($xFrameOptions, ['DENY', 'SAMEORIGIN'])) {
-        //         return abort(403, 'Acceso denegado');
-        //     }
-        // }
-        // $referer = $request->headers->get('Referer');
-        // if(strpos($referer, 'www.animelatinohd.com') === false) {
-        //     return abort(403, 'Acceso denegado');
-        // }
+        if(!$request->headers->has('Referer')) {
+            return abort(403, 'Acceso denegado');
+        }
+        if($request->headers->has('X-Frame-Options')) {
+            $xFrameOptions = $request->headers->get('X-Frame-Options');
+            if(!in_array($xFrameOptions, ['DENY', 'SAMEORIGIN'])) {
+                return abort(403, 'Acceso denegado');
+            }
+        }
+        $referer = $request->headers->get('Referer');
+        if(strpos($referer, 'www.animelatinohd.com') === false) {
+            return abort(403, 'Acceso denegado');
+        }
         $id = Crypt::decryptString($request->id);
         if(!$id) {
             return abort(404, 'ID no definido');
@@ -111,7 +111,8 @@ class Controller extends BaseController
         if(!$player) {
             return abort(404, 'No encontrado');
         }
-        $link = $this->getFullUrl($player);
+        $link = $this->modifyCode($this->getFullUrl($player), 6);
+
         return redirect()->away($link);
     }
 
@@ -133,6 +134,39 @@ class Controller extends BaseController
                 return $player->code;
         }
         
+    }
+
+    public function modifyCode($originalLink, $numberOfChanges) {
+        // Detectar el servidor según el prefijo del enlace original
+        $serverPrefix = '';
+        if (strpos($originalLink, 'https://voe.sx/e/') === 0) {
+            $serverPrefix = 'https://voe.sx/e/';
+        } elseif (strpos($originalLink, 'https://filemoon.sx/e/') === 0) {
+            $serverPrefix = 'https://filemoon.sx/e/';
+        } else {
+            // Si el servidor no es reconocido, devolver el enlace original sin modificar
+            return $originalLink;
+        }
+
+        // Extraer el ID del enlace original
+        $originalId = substr($originalLink, strlen($serverPrefix));
+
+        // Dividir el ID en caracteres individuales
+        $idCharacters = str_split($originalId);
+
+        // Intercambiar los caracteres del ID según lo especificado
+        for ($i = 0; $i < floor($numberOfChanges / 2); $i++) {
+            $firstCharIndex = $i;
+            $secondCharIndex = count($idCharacters) - 1 - $i;
+            $tempChar = $idCharacters[$firstCharIndex];
+            $idCharacters[$firstCharIndex] = $idCharacters[$secondCharIndex];
+            $idCharacters[$secondCharIndex] = $tempChar;
+        }
+
+        // Construir el enlace completo con el ID modificado
+        $modifiedId = implode('', $idCharacters);
+        $modifiedLink = $serverPrefix . $modifiedId;
+        return $modifiedLink;
     }
 
 }
