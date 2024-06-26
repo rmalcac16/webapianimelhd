@@ -26,6 +26,7 @@ Route::middleware('encrypted')->group(function () {
     Route::get("anime/simulcast", [Controller::class, 'simulcast']);
     Route::get("anime/search", [Controller::class, 'search']);
     Route::get("anime/latino", [Controller::class, 'latino']);
+    Route::get("anime/castellano", [Controller::class, 'castellano']);
     Route::get("anime/trending", [Controller::class, 'trending']);
     Route::get("anime/more-view", [Controller::class, 'moreview']);
     Route::get("anime/{slug}", [Controller::class, 'anime']);

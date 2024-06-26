@@ -32,6 +32,22 @@ class Anime extends Model
         }
     }
 
+    public function castellano(){
+        try {
+            $data = $this->select('name', 'slug', 'poster', 'vote_average','status',
+		     DB::raw('MAX(number) as number'),DB::raw('MAX(players.id) as idplayer'))
+			->LeftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
+			->LeftJoin('players','episode_id', '=', 'episodes.id')
+			->where('players.languaje', '=', 2)
+			->groupBy('animes.id')
+			->orderBy('idplayer','desc')
+			->get();
+            return response()->json($data, 200);
+        } catch (Exception $e) {
+            return array('message' => $e->getMessage());
+        }
+    }
+
     public function trending(){
         try {
             $data = $this->select('name','slug','poster','vote_average','aired')

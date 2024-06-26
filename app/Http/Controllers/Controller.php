@@ -58,6 +58,10 @@ class Controller extends BaseController
         return $this->anime->latino();
     }
 
+    public function castellano(){
+        return $this->anime->castellano();
+    }
+
     public function trending(){
         return $this->anime->trending();
     }
