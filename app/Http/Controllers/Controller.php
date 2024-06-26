@@ -97,12 +97,6 @@ class Controller extends BaseController
         if(!$request->headers->has('Referer')) {
             return abort(403, 'Acceso denegado');
         }
-        if($request->headers->has('X-Frame-Options')) {
-            $xFrameOptions = $request->headers->get('X-Frame-Options');
-            if(!in_array($xFrameOptions, ['DENY', 'SAMEORIGIN'])) {
-                return abort(403, 'Acceso denegado');
-            }
-        }
         $referer = $request->headers->get('Referer');
         if(strpos($referer, 'www.animelatinohd.com') === false) {
             return abort(403, 'Acceso denegado');
