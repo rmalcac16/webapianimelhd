@@ -115,7 +115,7 @@ class Controller extends BaseController
         if(!$player) {
             return abort(404, 'No encontrado');
         }
-        $link = $this->modifyCode($this->getFullUrl($player), 6);
+        $link = $this->modifyCode($player->code, 6);
 
         return redirect()->away($link);
     }
@@ -143,7 +143,9 @@ class Controller extends BaseController
     public function modifyCode($originalLink, $numberOfChanges) {
         // Detectar el servidor según el prefijo del enlace original
         $serverPrefix = '';
-        if (strpos($originalLink, 'https://filemoon.sx/e/') === 0) {
+        if (strpos($originalLink, 'https://voe.sx/e/') === 0) {
+            $serverPrefix = 'https://voe.sx/e/';
+        } elseif (strpos($originalLink, 'https://filemoon.sx/e/') === 0) {
             $serverPrefix = 'https://filemoon.sx/e/';
         } else {
             // Si el servidor no es reconocido, devolver el enlace original sin modificar
