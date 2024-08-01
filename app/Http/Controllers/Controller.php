@@ -115,10 +115,10 @@ class Controller extends BaseController
         if(!$player) {
             return abort(404, 'No encontrado');
         }
-        
+
         //$link = $this->modifyCode($player->code, 6);
 
-        return redirect()->away($link);
+        return redirect()->away($player->code);
     }
 
     public function getFullUrl($player){
