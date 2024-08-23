@@ -18,10 +18,17 @@ class Anime extends Model
 
     public function releases(){
         try {
-            return $this->select('name','slug','poster')
-                ->orderBy('id','desc')
-                ->limit(14)
-                ->get();
+            return $this->select([
+                'animes.name',
+                'animes.slug',
+                'animes.poster',
+                \DB::raw("sum(episodes.views_app) as totalviews")
+            ])
+            ->leftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
+            ->groupBy('animes.id')
+            ->orderBy('animes.id', 'desc')
+            ->limit(14)
+            ->get();
         } catch (Exception $e) {
             return [];
         }
