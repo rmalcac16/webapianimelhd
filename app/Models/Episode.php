@@ -21,14 +21,22 @@ class Episode extends Model
     public function releases()
     {
         try {
-            $data = $this->select('animes.name', 'animes.slug','animes.banner', 'animes.poster', 'players.created_at', 'episodes.number', 'players.languaje')
-            ->leftJoin('players','players.episode_id','episodes.id')
+            return $this->select(
+                'animes.name',
+                'animes.slug',
+                'animes.banner',
+                'animes.poster',
+                DB::raw('MAX(players.created_at) as created_at'),
+                'episodes.number',
+                'players.languaje'
+            )
+            ->leftJoin('players', 'players.episode_id', 'episodes.id')
             ->leftJoin('animes', 'animes.id', 'episodes.anime_id')
             ->where('animes.aired', '>=', '2024-01-08')
             ->groupBy('players.languaje', 'episodes.id')
-		    ->orderBy('players.created_at', 'desc')
-            ->limit(14)
-			->get();
+            ->orderBy('created_at', 'desc')
+            ->limit(12)
+            ->get(); 
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
