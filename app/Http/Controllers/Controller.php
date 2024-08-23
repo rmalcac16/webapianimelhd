@@ -31,7 +31,11 @@ class Controller extends BaseController
     }
 
     public function releases(){
-        return $this->episode->releases();
+        return response()->json([ 
+            'episodes' => $this->episode->releases(),
+            'animes' => $this->anime->releases()
+        ], 
+        200);
     }
 
     public function anime(Request $request){

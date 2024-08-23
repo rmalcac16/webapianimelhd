@@ -16,6 +16,14 @@ class Anime extends Model
         return $this->hasMany(Episode::class);
     }
 
+    public function releases(){
+        try {
+            return $this->select('name','slug','poster')->limit(14)->get();
+        } catch (Exception $e) {
+            return [];
+        }
+    }
+
     public function latino(){
         try {
             $data = $this->select('name', 'slug', 'poster', 'vote_average','status',
