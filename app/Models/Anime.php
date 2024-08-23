@@ -18,7 +18,10 @@ class Anime extends Model
 
     public function releases(){
         try {
-            return $this->select('name','slug','poster')->limit(14)->get();
+            return $this->select('name','slug','poster')
+                ->orderBy('id','desc')
+                ->limit(14)
+                ->get();
         } catch (Exception $e) {
             return [];
         }
