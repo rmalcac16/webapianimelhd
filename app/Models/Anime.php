@@ -141,8 +141,7 @@ class Anime extends Model
 	public function animes($request)
     {
         try {
-            $data = $this->select('name', 'slug', 'poster', 'aired', 'vote_average')
-		->orderBy('aired','desc');
+            $data = $this->select('name', 'slug', 'poster', 'aired', 'vote_average')->orderBy('id','desc');
 		if($request->type){
 			$data = $data->where('type',$request->type);
 		}

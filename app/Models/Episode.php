@@ -24,9 +24,9 @@ class Episode extends Model
             $data = $this->select('animes.name', 'animes.slug','animes.banner', 'animes.poster', 'players.created_at', 'episodes.number', 'players.languaje')
             ->leftJoin('players','players.episode_id','episodes.id')
             ->leftJoin('animes', 'animes.id', 'episodes.anime_id')
-            ->where('animes.status', 1)
+            ->where('animes.aired', '>=', '2024-01-08')
             ->groupBy('players.languaje', 'episodes.id')
-		    ->orderBy('players.id', 'desc')
+		    ->orderBy('players.created_at', 'desc')
             ->limit(14)
 			->get();
             return response()->json($data, 200);
