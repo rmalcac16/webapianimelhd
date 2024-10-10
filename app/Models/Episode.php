@@ -26,16 +26,18 @@ class Episode extends Model
                 'animes.slug',
                 'animes.banner',
                 'animes.poster',
-                DB::raw('MAX(players.created_at) as created_at'),
+                'players.created_at',
                 'episodes.number',
                 'players.languaje'
             )
             ->leftJoin('players', 'players.episode_id', 'episodes.id')
             ->leftJoin('animes', 'animes.id', 'episodes.anime_id')
-            ->where('animes.aired', '>=', '2024-01-08')
+            ->where('animes.status', 1)
+            ->orwhere('animes.status', 0)
+            ->where('episodes.created_at', '>=', '2024-08-08')
             ->groupBy('players.languaje', 'episodes.id')
-            ->orderBy('created_at', 'desc')
-            ->limit(12)
+            ->orderBy('players.id', 'desc')
+            ->limit(18)
             ->get(); 
             return response()->json($data, 200);
         } catch (Exception $e) {
