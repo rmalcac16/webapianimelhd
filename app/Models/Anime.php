@@ -125,6 +125,7 @@ class Anime extends Model
             ->where('slug', $request->slug)
             ->groupBy('animes.id')
             ->first();
+            $data->increment('views');
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);

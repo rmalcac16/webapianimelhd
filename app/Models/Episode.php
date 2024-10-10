@@ -56,10 +56,13 @@ class Episode extends Model
                 ->where('number',$request->number)
                 ->first();
             if(!$data) return response()->json(['message' => 'Episode not found'], 404);
+            $anime->increment('views');
+            $data->increment('views');
             $data->anime = $anime;
             $data->anterior = $this->previous($anime, $request->number);
             $data->siguiente = $this->next($anime, $request->number);
             $data->players = $this->players($data->id, $request);
+            
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
