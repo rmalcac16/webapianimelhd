@@ -20,8 +20,9 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
+if (env('ENCRYPTED_DATA'))
 Route::middleware('encrypted')->group(function () {
-    Route::get("releases",[Controller::class, 'releases']);
+    Route::get("releases", [Controller::class, 'releases']);
     Route::get("anime/list", [Controller::class, 'animes']);
     Route::get("anime/simulcast", [Controller::class, 'simulcast']);
     Route::get("anime/search", [Controller::class, 'search']);
@@ -32,6 +33,18 @@ Route::middleware('encrypted')->group(function () {
     Route::get("anime/{slug}", [Controller::class, 'anime']);
     Route::get("anime/{slug}/episodes/{number}", [Controller::class, 'episode']);
 });
+else {
+    Route::get("releases", [Controller::class, 'releases']);
+    Route::get("anime/list", [Controller::class, 'animes']);
+    Route::get("anime/simulcast", [Controller::class, 'simulcast']);
+    Route::get("anime/search", [Controller::class, 'search']);
+    Route::get("anime/latino", [Controller::class, 'latino']);
+    Route::get("anime/castellano", [Controller::class, 'castellano']);
+    Route::get("anime/trending", [Controller::class, 'trending']);
+    Route::get("anime/more-view", [Controller::class, 'moreview']);
+    Route::get("anime/{slug}", [Controller::class, 'anime']);
+    Route::get("anime/{slug}/episodes/{number}", [Controller::class, 'episode']);
+}
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::get('/token/{episode_id}', [Controller::class, 'token']);
