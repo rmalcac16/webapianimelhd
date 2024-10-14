@@ -62,6 +62,7 @@ class Episode extends Model
             $data->anterior = $this->previous($anime, $request->number);
             $data->siguiente = $this->next($anime, $request->number);
             $data->players = $this->players($data->id, $request);
+            
             return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
