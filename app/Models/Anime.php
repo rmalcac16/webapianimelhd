@@ -19,16 +19,17 @@ class Anime extends Model
     public function releases(){
         try {
             return $this->select([
-                'animes.name',
-                'animes.slug',
-                'animes.poster',
-                \DB::raw("sum(episodes.views_app) as totalviews")
-            ])
-            ->leftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
-            ->groupBy('animes.id')
-            ->orderBy('animes.id', 'desc')
-            ->limit(14)
-            ->get();
+                    'animes.name',
+                    'animes.slug',
+                    'animes.poster',
+                    \DB::raw("sum(episodes.views_app) as totalviews")
+                ])
+                ->leftJoin('episodes', 'episodes.anime_id', '=', 'animes.id')
+                ->whereNotNull('episodes.id')
+                ->groupBy('animes.id')
+                ->orderBy('animes.id', 'desc')
+                ->limit(14)
+                ->get();
         } catch (Exception $e) {
             return [];
         }
@@ -66,50 +67,60 @@ class Anime extends Model
         }
     }
 
-    public function trending(){
+    public function trending()
+    {
         try {
-            $data = $this->select('name','slug','poster','vote_average','aired')
-            ->orderBy('vote_average','desc')			
-			->limit(28)
-			->get();
+            $data = $this->select('name', 'slug', 'poster', 'vote_average', 'aired')
+                ->join('episodes', 'episodes.anime_id', '=', 'animes.id')
+                ->groupBy('animes.id')
+                ->orderBy('vote_average', 'desc')
+                ->limit(28)
+                ->get();
             return response()->json(["popular_today" => $data], 200);
         } catch (Exception $e) {
-            return array('message' => $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function moreview(){
+
+    public function moreview()
+    {
         try {
-            $data = $this->select([
-				\DB::raw("sum(episodes.views) as totalviews")
-			,'name','slug','poster','aired'])
-			->leftJoin('episodes','episodes.anime_id','=','animes.id')
-			->groupBy('animes.id')
-			->orderBy('totalviews','desc')
-			->limit(14)			
-			->get();
+            $data = $this->select(['name', 'slug', 'poster', 'aired', 'animes.views as totalviews'])
+                ->join('episodes', 'episodes.anime_id', '=', 'animes.id')
+                ->groupBy('animes.id')
+                ->orderBy('totalviews', 'desc')
+                ->limit(14)
+                ->get();
             return response()->json(["being_watched" => $data], 200);
         } catch (Exception $e) {
-            return array('message' => $e->getMessage());
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
 
-    public function search($request){
+
+    public function search($request)
+    {
         try {
-            $data = $this->select('name','slug','type','poster')
-			->where('name','LIKE',"%{$request->search}%")
-			->orwhere('name_alternative','LIKE',"%{$request->search}%")
-			->orwhere('overview','LIKE',"%{$request->search}%")
-			->orwhere('genres','LIKE',"%{$request->search}%")
-			->orwhere('aired','LIKE',"%{$request->search}%")
-	        ->orderBy('aired','desc')
-	        ->limit(10)
-			->get();
+            $data = $this->select('name', 'slug', 'type', 'poster')
+                ->join('episodes', 'episodes.anime_id', '=', 'animes.id')
+                ->where(function ($query) use ($request) {
+                    $query->where('name', 'LIKE', "%{$request->search}%")
+                        ->orWhere('name_alternative', 'LIKE', "%{$request->search}%")
+                        ->orWhere('overview', 'LIKE', "%{$request->search}%")
+                        ->orWhere('genres', 'LIKE', "%{$request->search}%")
+                        ->orWhere('aired', 'LIKE', "%{$request->search}%");
+                })
+                ->groupBy('animes.id')
+                ->orderBy('aired', 'desc')
+                ->limit(10)
+                ->get();
             return response()->json($data, 200);
         } catch (Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 401);
+            return response()->json(['message' => $e->getMessage()], 500);
         }
     }
+
 
     public function anime($request){
         try {
@@ -152,27 +163,35 @@ class Anime extends Model
 	public function animes($request)
     {
         try {
-            $data = $this->select('name', 'slug', 'poster', 'aired', 'vote_average')->orderBy('id','desc');
-		if($request->type){
-			$data = $data->where('type',$request->type);
-		}
-		if(isset($request->status)){
-			$data = $data->where('status',$request->status);
-		}
-		if($request->year){
-			$data = $data->whereYear('aired',$request->year);
-		}
-		if($request->genre){
-			$data = $data->where('genres','LIKE',"%{$request->genre}%");
-		}
-		if($request->search){
-			$data = $data->where('name','LIKE',"%{$request->search}%");
-			$data = $data->orwhere('name_alternative','LIKE',"%{$request->search}%");
-		}
-		$data = $data->simplePaginate(28);
-        return response()->json($data, 200);
+            $data = $this->select('animes.name', 'animes.slug', 'animes.poster', 'animes.aired', 'animes.vote_average')
+                ->join('episodes', 'episodes.anime_id', '=', 'animes.id')
+                ->groupBy('animes.id')
+                ->orderBy('animes.id', 'desc');
+
+            if ($request->type) {
+                $data = $data->where('animes.type', $request->type);
+            }
+            if (isset($request->status)) {
+                $data = $data->where('animes.status', $request->status);
+            }
+            if ($request->year) {
+                $data = $data->whereYear('animes.aired', $request->year);
+            }
+            if ($request->genre) {
+                $data = $data->where('animes.genres', 'LIKE', "%{$request->genre}%");
+            }
+            if ($request->search) {
+                $data = $data->where(function ($query) use ($request) {
+                    $query->where('animes.name', 'LIKE', "%{$request->search}%")
+                        ->orWhere('animes.name_alternative', 'LIKE', "%{$request->search}%");
+                });
+            }
+
+            $data = $data->simplePaginate(28);
+            return response()->json($data, 200);
         } catch (Exception $e) {
             return response()->json(['message' => $e->getMessage()], 401);
         }
     }
+
 }
