@@ -122,7 +122,7 @@ class Controller extends BaseController
 
         //$link = $this->modifyCode($player->code, 6);
 
-        return redirect()->away(getFullUrl($player));
+        return redirect()->away($this->getFullUrl($player));
     }
 
     public function getFullUrl($player)
