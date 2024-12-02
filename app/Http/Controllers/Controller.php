@@ -122,28 +122,25 @@ class Controller extends BaseController
 
         //$link = $this->modifyCode($player->code, 6);
 
-        return redirect()->away($player->code);
+        return redirect()->away(getFullUrl($player));
     }
 
-    public function getFullUrl($player){
+    public function getFullUrl($player)
+    {
+        if (!empty($player->server->embed)) {
+            preg_match('#/(e|d)/([^/]+)#i', $player->code, $matches);
 
-        switch ($player->server->type) {
-            case '0':
-                return $player->code;
-            case '1':
-                return $player->code;
-            case '2':
-                if (strtolower($player->server->title) == "gamma") {
-                    $idVoe = explode("/", $player->code);
-                    $idVoe = $idVoe[4];
-                    $player->code = $player->server->embed . "e/" . $idVoe;
-                }
-                return $player->code;
-            default:
-                return $player->code;
+            if (!empty($matches[2])) {
+                $id = $matches[2];
+                $prefix = $matches[1];
+                return $player->server->embed . $prefix . "/" . $id;
+            }
         }
-        
+
+        return $player->code;
     }
+
+
 
     public function modifyCode($originalLink, $numberOfChanges) {
         // Detectar el servidor según el prefijo del enlace original
